@@ -15,5 +15,120 @@ Bonus (+10 for each):
 
 
 Compile Steps:
+To compile the program, simply type the command "make". To run it, use "./TicTacToe.exe".
 
-Output:
+Sample Output:
+
+What size board would you like to play on? Please enter a number between 3 and 9, inclusive: 3
+Do you want to play in tournament mode? (y/n) n
+Do you want to go first? (y/n) y
+Enter a square: 1
+
+   *   *
+ X *   *
+   *   *
+***********
+   *   *
+   *   *
+   *   *
+***********
+   *   *
+   *   *
+   *   *
+
+
+I am choosing square 5!
+
+   *   *
+ X *   *
+   *   *
+***********
+   *   *
+   * O *
+   *   *
+***********
+   *   *
+   *   *
+   *   *
+
+Enter a square: 9
+
+   *   *
+ X *   *
+   *   *
+***********
+   *   *
+   * O *
+   *   *
+***********
+   *   *
+   *   * X
+   *   *
+
+
+I am choosing square 7!
+
+   *   *
+ X *   *
+   *   *
+***********
+   *   *
+   * O *
+   *   *
+***********
+   *   *
+ O *   * X
+   *   *
+
+Enter a square: 3
+
+   *   *
+ X *   * X
+   *   *
+***********
+   *   *
+   * O *
+   *   *
+***********
+   *   *
+ O *   * X
+   *   *
+
+
+I am choosing square 6!
+
+   *   *
+ X *   * X
+   *   *
+***********
+   *   *
+   * O * O
+   *   *
+***********
+   *   *
+ O *   * X
+   *   *
+
+Enter a square: 2
+
+   *   *
+ X * X * X
+   *   *
+***********
+   *   *
+   * O * O
+   *   *
+***********
+   *   *
+ O *   * X
+   *   *
+
+
+Congratulations, you win!
+
+Computer: 0
+Player: 1
+Draws:0
+Do you want to play again? (y/n) n
+
+

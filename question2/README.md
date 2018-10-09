@@ -18,6 +18,6 @@ Bonus (+10 for each):
 * Extend the game so that the user can specify the size of board that they want to play on (nxm).
 * Have a computer so that can play relatively smart. (i.e. if there is a chance to get an SOS, it will go for it!).
 
-Compile Steps:
+Compile Steps: To compile this code, use the command "make". To then run the compiled code, run the command "./SOS.exe".
 
 Output:

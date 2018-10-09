@@ -3,27 +3,15 @@
  * The program uses a specified, not-perfect strategy.
  * The code uses only basic programming concepts.
  * Written by: Carl Sable
- * Extended by: _____
+ * Extended by: Nathaniel Kingsbury
  */
 
 #include <stdio.h>
+#include <basic_functions.h>
+#include <computer_moves.h>
+#include <player_moves.h>
 
-void init_board(void);
-void draw_board(void);
-int user_first(void);
-int play_again(void);
-int symbol_won(char);
-int find_win(char);
-int middle_open(void);
-int find_corner(void);
-int find_side(void);
-void computer_move(void);
-int square_valid(int);
-void player_move(void);
-void play_game(void);
-
-char board[3][3];
-char computer, user;
+int play_game(int, char, char, char board[10][10]);
 
 /* 
  * Initialize the board, ask who goes first, play a game,
@@ -31,9 +19,24 @@ char computer, user;
  */
 int main(void)
 {
+  char board[10][10];
+  int n = 0;
+  char c, user, computer;
+  do {
+    printf("What size board would you like to play on? Please enter a number between 3 and 9, inclusive: ");
+    n = getchar() - '0';
+    while ((c = getchar()) != '\n'); // eat anything extra up to the newline
+    if (n < 3 || n > 9){
+	    printf ("Invalid choice\n");
+	    n = 0;
+    }
+  } while (!n);
+  int mode = mode_check();
+  int player_wins, comp_wins, draws, games_played = 0;
+  int winner;
   while(1)
   {
-    init_board();
+    init_board(board);
     if (user_first())
     {
       computer = 'O';
@@ -44,306 +47,74 @@ int main(void)
       computer = 'X';
       user = 'O';
     }
-    play_game();
-    if (!play_again())
+    winner = play_game(n, user, computer, board);
+    games_played++;
+    if (winner == 1){
+	    comp_wins++;
+    }
+    else if (winner == 2){
+	    player_wins++;
+    }
+    else if (winner == 0){
+	    draws++;
+    }
+    printf("Computer: %d\nPlayer: %d\nDraws:%d\n", comp_wins, player_wins, draws);
+    if (!mode){
+      if (!play_again())
+        break;
+    }
+    if (games_played == mode){
+      if (comp_wins > player_wins){
+	      printf("I WIN THE TOURNAMENT!!!!!!!!");
+      }
+      else if (player_wins > comp_wins){
+	      printf("Congradulations, you win the tournament");
+      }
+      else{
+	      printf("The tournament is a draw.");
+      }
       break;
-  }
-  return 0;
-}
-
-/* Make sure board starts off empty. */
-void init_board(void)
-{
-  int row, col;
-
-  for (row = 0; row < 3; row++)
-    for (col = 0; col < 3; col++)
-      board[row][col] = ' ';
-
-  return;
-}
-
-/* Display the board to standard output. */
-void draw_board(void)
-{
-  int row, col;
-
-  printf("\n");
-  for (row = 0; row < 3; row++)
-  {
-    printf("   *   *   \n");
-    printf(" %c * %c * %c \n",
-	   board[row][0], board[row][1], board[row][2]);
-    printf("   *   *   \n");
-    if (row != 2)
-      printf("***********\n");
-  }
-  printf("\n");
-
-  return;
-}
-
-/*
- * Ask if user wants to go first.
- * Returns 1 if yes, 0 if no.
- */
-int user_first(void)
-{
-  char response;
-
-  printf("Do you want to go first? (y/n) ");
-  do
-  {
-    response = getchar();
-  } while ((response != 'y') && (response != 'Y') &&
-	   (response != 'n') && (response != 'N'));
-
-  if ((response == 'y') || (response == 'Y'))
-    return 1;
-  else
-    return 0;
-}
-
-/*
- * Ask if user wants to play again.
- * Returns 1 if yes, 0 if no.
- */
-int play_again(void)
-{
-  char response;
-
-  printf("Do you want to play again? (y/n) ");
-  do
-  {
-    response = getchar();
-  } while ((response != 'y') && (response != 'Y') &&
-	   (response != 'n') && (response != 'N'));
-
-  if ((response == 'y') || (response == 'Y'))
-    return 1;
-  else
-    return 0;
-}
-
-/*
- * If middle square is empty, return 5;
- * otherwise return 0.
- */
-int middle_open(void)
-{
-  if (board[1][1] == ' ')
-    return 5;
-  else
-    return 0;
-}
-
-/* 
- * Return the number of an empty corner, if one exists;
- * otherwise return 0.
- */
-int find_corner(void)
-{
-  if (board[0][0] == ' ')
-    return 1;
-  if (board[0][2] == ' ')
-    return 3;
-  if (board[2][0] == ' ')
-    return 7;
-  if (board[2][2] == ' ')
-    return 9;
-
-  return 0;
-}
-
-/*
- * Return the number of an empty side square, if one exists;
- * otherwise return 0.
- */
-int find_side(void)
-{
-  if (board[0][1] == ' ')
-    return 2;
-  if (board[1][0] == ' ')
-    return 4;
-  if (board[1][2] == ' ')
-    return 6;
-  if (board[2][1] == ' ')
-    return 8;
-
-  return 0;
-}
-
-/* Check if the given square is valid and empty. */
-int square_valid(int square)
-{
-  int row, col;
-
-  row = (square - 1) / 3;
-  col = (square - 1) % 3;
-
-  if ((square >= 1) && (square <= 9))
-  {
-    if (board[row][col] == ' ')
-      return 1;
-  }
-
-  return 0;
-}
-
-/* Check if the given symbol has already won the game. */
-int symbol_won(char symbol)
-{
-  int row, col;
-
-  for (row = 0; row < 3; row++)
-  {
-    if ((board[row][0] == symbol) &&
-	(board[row][1] == symbol) &&
-	(board[row][2] == symbol))
-      return 1;
-  }
-
-  for (col = 0; col < 3; col++)
-  {
-    if ((board[0][col] == symbol) &&
-	(board[1][col] == symbol) &&
-	(board[2][col] == symbol))
-      return 1;
-  }
-
-  if ((board[0][0] == symbol) &&
-      (board[1][1] == symbol) &&
-      (board[2][2] == symbol))
-    return 1;
-
-  if ((board[0][2] == symbol) &&
-      (board[1][1] == symbol) &&
-      (board[2][0] == symbol))
-    return 1;
-
-  return 0;
-}
-
-/* 
- * Find a win, if any, for the given symbol.
- * If a winning square exists, return the square;
- * otherwise, return 0.
- */
-int find_win(char symbol)
-{
-  int square, row, col;
-  int result = 0;
-
-  /*
-   * Loop through the 9 squares.
-   * For each, if it is empty, fill it in with the given
-   * symbol and check if this has resulted in a win.
-   * If so, keep track of this square in result.
-   * Either way, reset the square to empty afterwards.
-   * After the loop, if one or more wins have been found,
-   * the last will be recorded in result.
-   * Otherwise, result will still be 0.
-   */
-  for (square = 1; square <= 9; square++)
-  {
-    row = (square - 1) / 3;
-    col = (square - 1) % 3;
-
-    if (board[row][col] == ' ')
-    {
-      board[row][col] = symbol;
-      if (symbol_won(symbol))
-	result = square;
-      board[row][col] = ' ';
     }
   }
-
-  return result;
-}
-
-/* Choose a move for the computer. */
-void computer_move(void)
-{
-  int square;
-  int row, col;
-
-  /* Use first strategy rule that returns valid square */
-  square = find_win(computer);
-  if (!square)
-    square = find_win(user);
-  if (!square)
-    square = middle_open();
-  if (!square)
-    square = find_corner();
-  if (!square)
-    square = find_side();
-
-  printf("\nI am choosing square %d!\n", square);
-
-  row = (square - 1) / 3;
-  col = (square - 1) % 3;
-
-  board[row][col] = computer;
-
-  return;
-}
-
-/* Have the user choose a move. */
-void player_move(void)
-{
-  int square;
-  int row, col;
-
-  do
-  {
-    printf("Enter a square: ");
-    scanf("%d", &square);
-  } while (!square_valid(square));
-
-  row = (square - 1) / 3;
-  col = (square - 1) % 3;
-
-  board[row][col] = user;
-
-  return;
+  return 0;
 }
 
 /* Loop through 9 turns or until somebody wins. */
-void play_game(void)
+int play_game(int n, char user, char computer, char board[10][10])
 {
   int turn;
 
-  for (turn = 1; turn <= 9; turn++)
+  for (turn = 1; turn <= n*n; turn++)
   {
     /* Check if turn is even or odd 
        to determine which player should move. */
     if (turn % 2 == 1)
     {
       if (computer == 'X')
-        computer_move();
+        computer_move(n, user, computer, board);
       else
-        player_move();
+        player_move(n, user, board);
     }
     else
     {
       if (computer == 'O')
-        computer_move();
+        computer_move(n, user, computer, board);
       else
-        player_move();
+        player_move(n, user, board);
     }
 
-    draw_board();
+    draw_board(n, board);
 
-    if (symbol_won(computer)) {
+    if (symbol_won(computer, n, board)) {
       printf("\nI WIN!!!\n\n");
-      return;
+      return 1;
     }
-    else if (symbol_won(user)) {
+    else if (symbol_won(user, n, board)) {
       printf("\nCongratulations, you win!\n\n");
-      return;
+      return 2;
     }
   }
 
   printf("\nThe game is a draw.\n\n");
-  return;
+  return 0;
 }
